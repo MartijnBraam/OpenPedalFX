@@ -151,7 +151,31 @@ void OLED_Command(uint8_t command)
 
 void OLED_Init(void)
 {
-  OLED_Command(0xAE); // Display off	
+  OLED_Command(0xAE); // Display off
+  OLED_Command(0xD5); // Set display clock div
+  OLED_Command(0x80); // Suggested ratio
+  OLED_Command(0xA8); // Set multiplex
+  OLED_Command(0x3f); // 
+  OLED_Command(0xD3); // Set display offset
+  OLED_Command(0x00); // No offset
+  OLED_Command(0x40); // Set startline = 0 (0x40 | 0x00)
+  OLED_Command(0x8D); // Charge pump
+  OLED_Command(0x14); // Set non-external VCC for charge pump
+  OLED_Command(0x20); // Memory mode
+  OLED_Command(0x00); // act like ks0108?
+  OLED_Command(0xA1); // Segremap | 0x01
+  OLED_Command(0xC8); // comscandec
+  OLED_Command(0xDA); // Set com pins
+  OLED_Command(0x12); // 
+  OLED_Command(0x81); // Set contrast
+  OLED_Command(0xCF); // Contrast for internal vcc
+  OLED_Command(0xD9); // Set precharge
+  OLED_Command(0xF1); // Set internal vcc for precharge
+  OLED_Command(0xDB); // Set vcom detect
+  OLED_Command(0x40); // 
+  OLED_Command(0xA4); // Display All on resume
+  OLED_Command(0xA6); // Normal display
+  OLED_Command(0xAF); // Display on
 }
 
 /* ADC init function */
