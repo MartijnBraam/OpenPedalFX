@@ -53,6 +53,8 @@ static void MX_GPIO_Init(void);
 static void MX_ADC_Init(void);
 static void MX_I2C1_Init(void);
 
+static void OLED_Init(void);
+
 /* USER CODE BEGIN PFP */
 /* Private function prototypes -----------------------------------------------*/
 
@@ -81,7 +83,7 @@ int main(void)
   MX_GPIO_Init();
   MX_ADC_Init();
   MX_I2C1_Init();
-
+  OLED_Init();
   /* USER CODE BEGIN 2 */
 
   /* USER CODE END 2 */
@@ -135,6 +137,21 @@ void SystemClock_Config(void)
 
   /* SysTick_IRQn interrupt configuration */
   HAL_NVIC_SetPriority(SysTick_IRQn, 0, 0);
+}
+
+void OLED_Command(uint8_t command)
+{
+  uint16_t address = 0x78;
+  uint8_t buffer[] = {0x00, command};
+  HAL_I2C_Master_Transmit(&hi2c1, address, (uint8_t*)buffer, 2, 1000);
+  while (HAL_I2C_GetState(&hi2c1) != HAL_I2C_STATE_READY){}
+  while (HAL_I2C_IsDeviceReady(&hi2c1, address, 20, 300) == HAL_TIMEOUT);
+  while (HAL_I2C_GetState(&hi2c1) != HAL_I2C_STATE_READY){}
+}
+
+void OLED_Init(void)
+{
+  OLED_Command(0xAE); // Display off	
 }
 
 /* ADC init function */
