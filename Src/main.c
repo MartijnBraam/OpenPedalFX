@@ -45,8 +45,6 @@ I2C_HandleTypeDef hi2c1;
 /* USER CODE BEGIN PV */
 /* Private variables ---------------------------------------------------------*/
 
-uint32_t audioInput;
-
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -61,6 +59,7 @@ static void OLED_Init(void);
 /* Private function prototypes -----------------------------------------------*/
 void OLED_Blit(uint8_t data);
 void OLED_Command(uint8_t data);
+void ADC_Start(void);
 /* USER CODE END PFP */
 
 /* USER CODE BEGIN 0 */
@@ -88,20 +87,21 @@ int main(void)
   MX_I2C1_Init();
   OLED_Init();
   /* USER CODE BEGIN 2 */
-
+  __IO uint16_t audioInput = 0;
   /* USER CODE END 2 */
-
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
   while (1)
   {
-  /* USER CODE END WHILE */
-
-  /* USER CODE BEGIN 3 */
-    OLED_Blit(0xFF);
+    /* USER CODE END WHILE */
+    HAL_ADC_Start(&hadc);
+    HAL_ADC_PollForConversion(&hadc, 10);
+    audioInput = HAL_ADC_GetValue(&hadc);
+    /* USER CODE BEGIN 3 */
+    OLED_Blit((uint8_t)(audioInput>>6));
+    HAL_Delay(10);
   }
   /* USER CODE END 3 */
-
 }
 
 /** System Clock Configuration
@@ -207,11 +207,11 @@ void MX_ADC_Init(void)
   hadc.Init.EOCSelection = EOC_SINGLE_CONV;
   hadc.Init.LowPowerAutoWait = DISABLE;
   hadc.Init.LowPowerAutoPowerOff = DISABLE;
-  hadc.Init.ContinuousConvMode = ENABLE;
+  hadc.Init.ContinuousConvMode = DISABLE;
   hadc.Init.DiscontinuousConvMode = DISABLE;
   hadc.Init.ExternalTrigConvEdge = ADC_EXTERNALTRIGCONVEDGE_NONE;
-  hadc.Init.DMAContinuousRequests = DISABLE;
-  hadc.Init.Overrun = OVR_DATA_PRESERVED;
+  hadc.Init.DMAContinuousRequests = ENABLE;
+  hadc.Init.Overrun = OVR_DATA_OVERWRITTEN;
   HAL_ADC_Init(&hadc);
 
     /**Configure for the selected ADC regular channel to be converted. 
@@ -221,11 +221,6 @@ void MX_ADC_Init(void)
   sConfig.SamplingTime = ADC_SAMPLETIME_1CYCLE_5;
   HAL_ADC_ConfigChannel(&hadc, &sConfig);
 
-}
-
-void ADC_Start(void)
-{
-  HAL_ADC_Start_DMA(&hadc, &audioInput, 1);
 }
 
 /* I2C1 init function */
