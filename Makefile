@@ -133,4 +133,8 @@ clean:
 #######################################
 -include $(shell mkdir .dep 2>/dev/null) $(wildcard .dep/*)
 
-# *** EOF ***
+upload:
+	openocd -f /usr/share/openocd/scripts/board/stm32f0discovery.cfg \
+		-c init -c "reset halt" \
+		-c "flash write_image erase build/OpenPedalFX.hex" \
+		-c "reset run" -c shutdown

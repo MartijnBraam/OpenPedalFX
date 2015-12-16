@@ -45,6 +45,8 @@ I2C_HandleTypeDef hi2c1;
 /* USER CODE BEGIN PV */
 /* Private variables ---------------------------------------------------------*/
 
+uint32_t audioInput;
+
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -57,7 +59,8 @@ static void OLED_Init(void);
 
 /* USER CODE BEGIN PFP */
 /* Private function prototypes -----------------------------------------------*/
-
+void OLED_Blit(uint8_t data);
+void OLED_Command(uint8_t data);
 /* USER CODE END PFP */
 
 /* USER CODE BEGIN 0 */
@@ -95,7 +98,7 @@ int main(void)
   /* USER CODE END WHILE */
 
   /* USER CODE BEGIN 3 */
-
+    OLED_Blit(0xFF);
   }
   /* USER CODE END 3 */
 
@@ -139,14 +142,24 @@ void SystemClock_Config(void)
   HAL_NVIC_SetPriority(SysTick_IRQn, 0, 0);
 }
 
-void OLED_Command(uint8_t command)
+void OLED_Write(uint8_t dataRegister, uint8_t data)
 {
   uint16_t address = 0x78;
-  uint8_t buffer[] = {0x00, command};
+  uint8_t buffer[] = {dataRegister, data};
   HAL_I2C_Master_Transmit(&hi2c1, address, (uint8_t*)buffer, 2, 1000);
   while (HAL_I2C_GetState(&hi2c1) != HAL_I2C_STATE_READY){}
   while (HAL_I2C_IsDeviceReady(&hi2c1, address, 20, 300) == HAL_TIMEOUT);
   while (HAL_I2C_GetState(&hi2c1) != HAL_I2C_STATE_READY){}
+}
+
+void OLED_Command(uint8_t data)
+{
+  OLED_Write(0, data);
+}
+
+void OLED_Blit(uint8_t data)
+{
+  OLED_Write(0x40, data);
 }
 
 void OLED_Init(void)
@@ -208,6 +221,11 @@ void MX_ADC_Init(void)
   sConfig.SamplingTime = ADC_SAMPLETIME_1CYCLE_5;
   HAL_ADC_ConfigChannel(&hadc, &sConfig);
 
+}
+
+void ADC_Start(void)
+{
+  HAL_ADC_Start_DMA(&hadc, &audioInput, 1);
 }
 
 /* I2C1 init function */
