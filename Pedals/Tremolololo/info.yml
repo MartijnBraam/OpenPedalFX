@@ -1,0 +1,8 @@
+name: Tremolololo
+author: Martijn Braam
+category: tremolo
+parameters: {}
+requirements:
+        inputs: 1
+        outputs: 1
+        controls: 2

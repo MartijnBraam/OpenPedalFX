@@ -7,6 +7,9 @@
 ######################################
 TARGET = OpenPedalFX
 
+# Default pedal of none is specified
+PEDAL = DigiBuffer
+
 ######################################
 # building variables
 ######################################
@@ -42,6 +45,7 @@ C_SOURCES = \
   Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_hal_rcc.c \
   Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_hal_rcc_ex.c \
   Src/main.c \
+  Src/pedal.c \
   Src/stm32f0xx_hal_msp.c \
   Src/stm32f0xx_it.c  
 ASM_SOURCES = \
@@ -90,8 +94,10 @@ LIBS = -lc -lm -lnosys
 LIBDIR =
 LDFLAGS = -mthumb -mcpu=cortex-m0 -specs=nano.specs -T$(LDSCRIPT) $(LIBDIR) $(LIBS) -Wl,-Map=$(BUILD_DIR)/$(TARGET).map,--cref -Wl,--gc-sections
 
+.PHONY: Src/pedal.c
+
 # default action: build all
-all: $(BUILD_DIR)/$(TARGET).elf $(BUILD_DIR)/$(TARGET).hex $(BUILD_DIR)/$(TARGET).bin
+all: Src/pedal.c $(BUILD_DIR)/$(TARGET).elf $(BUILD_DIR)/$(TARGET).hex $(BUILD_DIR)/$(TARGET).bin
 
 #######################################
 # build the application
@@ -132,6 +138,11 @@ clean:
 # dependencies
 #######################################
 -include $(shell mkdir .dep 2>/dev/null) $(wildcard .dep/*)
+
+Src/pedal.c:
+	rm -rf Src/pedal.c
+	cp Pedals/${PEDAL}/pedal.c Src/pedal.c
+	python3 Tools/buildSplash.py Pedals/${PEDAL}/splash.png >> Src/pedal.c
 
 upload:
 	openocd -f /usr/share/openocd/scripts/board/stm32f0discovery.cfg \

@@ -14,4 +14,9 @@ for y in range(0, int(canvas.size[1]/8)):
             output_byte=str(pixel)+output_byte
         output.append("0x%x" % int(output_byte,2))
 
-print(", ".join(output))
+print("void PedalSplash(uint8_t buffer[1024]){")
+print("  const uint8_t pixels[1024] = {")
+print("  "+", ".join(output))
+print("  };")
+print("  memcpy(buffer, pixels, 1024);")
+print("}")
