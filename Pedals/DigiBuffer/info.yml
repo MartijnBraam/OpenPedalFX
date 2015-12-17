@@ -1,0 +1,8 @@
+name: DigiBuffer
+author: Martijn Braam
+category: other
+parameters: {}
+requirements:
+        inputs: 1
+        outputs: 1
+        controls: 0
