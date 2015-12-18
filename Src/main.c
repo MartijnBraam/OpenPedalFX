@@ -201,8 +201,15 @@ void OLED_Clear(void)
 void OLED_BlitBuffer(uint8_t buffer[1024])
 {
   OLED_ResetPosition();
-  for (int i=0;i<1024;i++){
-    OLED_Blit(buffer[i]);
+  uint16_t address = 0x78;
+  uint8_t packet[33] = {0};
+  packet[0] = 0x40;
+  for (int i=0;i<32;i++){ 
+    memcpy(&packet[1], &buffer[i*32],32);
+    HAL_I2C_Master_Transmit(&hi2c1, address, (uint8_t*)packet, 33, 1000);
+    while (HAL_I2C_GetState(&hi2c1) != HAL_I2C_STATE_READY){}
+    while (HAL_I2C_IsDeviceReady(&hi2c1, address, 20, 300) == HAL_TIMEOUT);
+    while (HAL_I2C_GetState(&hi2c1) != HAL_I2C_STATE_READY){}
   }
 }
 void OLED_Splash(uint8_t buffer[1024])
